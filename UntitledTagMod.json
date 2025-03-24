@@ -1,0 +1,17 @@
+{
+	"id": "untitledtagmod",
+	"name": "Untitled Tag Mod",
+	"display_name": "Untitled Tag Mod",
+	"author": ["Ronitrocket", "Concavz"],
+	"description": "A (WIP) mod that adds many jokers and enhancements based around the Roblox game 'Untitled Tag Game'.",
+	"prefix": "untitledtagmod",
+	"main_file": "main.lua",
+	"priority": 0,
+	"badge_colour": "",
+	"badge_text_colour": "",
+	"version": "0.0.1",
+	"dependencies": [
+        "Steamodded (>=1.*)",
+		"Lovely (>=0.6)"
+    ]
+}

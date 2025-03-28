@@ -13,11 +13,6 @@ SMODS.Sticker {
             mult = 10,
         }
     },
-    
-
-    -- CURRENTLY NOT USED BECAUSE ANYTHING OTHER THAN 0, 0 WILL GET FUCKED UP LOOKING WHEN THE CARD IS RENDERED AT DIFFERENT SIZES (e.g deck view)
-    -- The pos of the sticker on the card. (very finnicky will try and make it normalized so 0, 0 is top left and 1, 1 is bottom right,)
-    sticker_position = {x=0.2, y=1.7},
    
     -- Lets the sticker be compatible with all cards.
     default_compat = true,
@@ -53,18 +48,9 @@ SMODS.Sticker {
         self.send_to_shader = self.send_to_shader or {}
         self.send_to_shader[1] = math.min(card.VT.r*3, 1) + G.TIMERS.REAL/(28) + (card.juice and card.juice.r*20 or 0) + card.tilt_var.amt
         self.send_to_shader[2] = G.TIMERS.REAL
-        --self.sprite = Sprite(0, 0, 0, 0, G.ASSET_ATLAS['untitledtagmod_stickerAtlas'], {x = 0, y = 0})
-        --print('a'..card.children.center.scale_mag)
-        --card.children.center.scale_mag = card.children.center.scale_mag*1.5
-        --print('b'..(card.children.center.scale_mag/1.5))
-        --print((card.children.center.scale_mag/1.5)/(34.53/self.sticker_position.x))
-        --print((card.children.center.scale_mag/1.5)/(34.53/self.sticker_position.y))
-        -- self.sticker_sprite:draw_shader('dissolve', 1, nil, nil, card.children.center, 0, 0, (card.children.center.scale_mag/1.5)/(34.53/(self.sticker_position.x+.1)), (card.children.center.scale_mag/1.5)/(34.53/(self.sticker_position.y+.1)))
-        -- self.sticker_sprite:draw_shader('dissolve', nil, nil, nil, card.children.center, 0, 0, (card.children.center.scale_mag/1.5)/(34.53/self.sticker_position.x), (card.children.center.scale_mag/1.5)/(34.53/self.sticker_position.y))
-        -- self.sticker_sprite:draw_shader('voucher', nil, self.send_to_shader, nil, card.children.center, 0, 0, (card.children.center.scale_mag/1.5)/(34.53/self.sticker_position.x), (card.children.center.scale_mag/1.5)/(34.53/self.sticker_position.y))
-        self.sticker_sprite:draw_shader('dissolve', 1, nil, nil, card.children.center, -.35, 0, -.15, -.15)
-        self.sticker_sprite:draw_shader('dissolve', nil, nil, nil, card.children.center, -.35, 0, -.2, -.2)
-        self.sticker_sprite:draw_shader('voucher', nil, nil, nil, card.children.center, -.35, 0, -.2, -.2)
+        self.sticker_sprite:draw_shader('dissolve', 1, nil, nil, card.children.center, -.5, 0, .05, 0, nil, nil, true)
+        self.sticker_sprite:draw_shader('dissolve', nil, nil, nil, card.children.center, -.5, 0, 0, -.05, nil, nil, true)
+        self.sticker_sprite:draw_shader('voucher', nil, nil, nil, card.children.center, -.5, 0, 0, -.05, nil, nil, true)
         --card.children.center.scale_mag = card.children.center.scale_mag/1.5
     end,
 
@@ -80,9 +66,11 @@ SMODS.Sticker {
                 if card == otherCard then
                     -- If the next card exists, continue.
                     if (index + 1) >= #context.scoring_hand then
-                        index = 1
+                        index = 0
                     end
-                    -- For some reason, using an event like is the only way to get the card to have the visual effect of being tagged happen along with the text. No idea why.
+                    -- Apparently, calculate functions process before animations finish.
+                    -- So to make the change of the sticker line up with the message, we had to use an event
+                    -- (The event is added at the end of an event queue, which means this will run after animations ig)
                     G.E_MANAGER:add_event(Event({
                         func = function() 
                             -- Apply the sticker to the next card.
@@ -102,29 +90,29 @@ SMODS.Sticker {
             end
         end
 
-        if context.after and context.cardarea == G.hand then
-            -- Loop through the scoring hand.
-            for index, otherCard in ipairs(G.hand) do
+        if context.end_of_round and context.cardarea == G.hand then
+            -- Loop through the hand.
+            for index, otherCard in ipairs(G.hand.cards) do
                 -- If we found our card, continue.
                 if card == otherCard then
                     -- If the next card exists, continue.
-                    if (index + 1) >= #G.hand then
-                        index = 1
+                    if (index + 1) >= #G.hand.cards then
+                        index = 0
                     end
                     -- For some reason, using an event like is the only way to get the card to have the visual effect of being tagged happen along with the text. No idea why.
                     G.E_MANAGER:add_event(Event({
                         func = function() 
-                            -- Apply the sticker to the next card.
-                            SMODS.Stickers[self.key]:apply(context.scoring_hand[index + 1], true);
                             -- Remove the sticker from the current card.
                             SMODS.Stickers[self.key]:apply(card, false);
-                            return true 
+                            -- Apply the sticker to the next card.
+                            SMODS.Stickers[self.key]:apply(G.hand.cards[index + 1], true);
+                            return true
                         end
                     }))
                     -- Return the message to display when the sticker is applied.
                     return {
                         message = 'Tagged!',
-                        message_card = context.scoring_hand[index + 1],
+                        message_card = G.hand.cards[index + 1],
                         colour = G.C.RED,
                     }
                 end

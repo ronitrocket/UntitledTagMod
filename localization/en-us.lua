@@ -1,5 +1,5 @@
 return {
-    description ={
+    descriptions = {
         Enhanced = {
             m_untitledtagmod_taggerOld = {
                 name = "Tagger",

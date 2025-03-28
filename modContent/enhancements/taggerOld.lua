@@ -20,6 +20,8 @@ SMODS.Enhancement {
         }
     end,
 
+    weight = 0,
+
     -- Calculate function for the enhancement.
     calculate = function(self, card, context)
         -- If the context is after scoring, and the cardarea is the play area, continue.

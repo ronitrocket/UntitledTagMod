@@ -14,7 +14,7 @@ SMODS.Atlas { -- enhancements
 
 SMODS.Atlas { -- stickers
   key = 'stickerAtlas',
-  px = 39,
-  py = 39,
+  px = 142,
+  py = 190,
   path = 'stickerAtlas.png'
 }

@@ -90,7 +90,7 @@ SMODS.Sticker {
             end
         end
 
-        if context.end_of_round and context.cardarea == G.hand then
+        if context.end_of_round and context.cardarea == G.hand and context.main_eval then
             -- Loop through the hand.
             for index, otherCard in ipairs(G.hand.cards) do
                 -- If we found our card, continue.
